@@ -2,7 +2,9 @@
 {% block title %} {{super()}} - Bands {% endblock %}
 {% block content %}
 <h2>Bands</h2>
-
+{% if bands|length < 1 %}
+<p>No bands in database!</p>
+{% else %}
 {% for band in bands %}
 <section>
     <h3><a href="{{url_for('view_band', id=band.BandID)}}">{{ band.BandName }} ({{ band.FormedYear }})</a></h3>
@@ -24,4 +26,5 @@
 </section>
 <hr>
 {% endfor %}
+{% endif %}
 {% endblock %}
