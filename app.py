@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-from model import db, Bands, Members, Albums, admin
+from model import db, Bands, Members, Albums, Memberships, admin
 from flask_admin.contrib.sqla import ModelView
 import os
 
@@ -96,3 +96,27 @@ with app.app_context():
 # Run the app if this file is launched via Python (instead of flask run --debug)
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/memberships/add', methods=['GET','POST'])
+def add_membership():
+    bands = Bands.query.all()
+    members = Members.query.all()
+    if request.method == 'POST':
+        try:
+            membership = Memberships(
+            BandID=request.form.get('bandid'),
+            MemberID=request.form.get('memberid'),
+            Role=request.form.get('role'),
+            StartYear=request.form.get('startyear') or None,
+            EndYear=request.form.get('endyear') or None
+            )
+            db.session.add(membership)
+            db.session.commit()
+            # flash('Membership assigned', 'success')
+            return redirect(url_for('view_by_band'))
+        except Exception as e:
+            db.session.rollback()
+            error = f"Error adding new membership: {e}"
+            return render_template('add_membership.html', bands=bands, members=members,
+error=error)
+    return render_template('add_membership.html', bands=bands, members=members)
