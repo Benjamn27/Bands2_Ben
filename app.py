@@ -33,18 +33,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/bands/view')
-def view_by_band():
-    bands = Bands.query.all()
-    return render_template('display_by_band.html', bands=bands)
-
-
-@app.route('/bands/view/<int:id>')
-def view_band(id):
-    band = Bands.query.get_or_404(id)
-    return render_template('view_band.html', band=band)
-
-
 @app.route('/bands/add', methods=['GET', 'POST'])
 def add_band():
     if request.method == 'POST':
@@ -66,7 +54,7 @@ def add_member():
         new_member = Members(
             MemberName=request.form['membername'],
             MainPosition=request.form['mainposition'],
-            BandID=request.form['bandid']
+            #BandID=request.form['bandid']
         )
         db.session.add(new_member)
         db.session.commit()
@@ -120,3 +108,83 @@ def add_membership():
             return render_template('add_membership.html', bands=bands, members=members,
 error=error)
     return render_template('add_membership.html', bands=bands, members=members)
+
+@app.route('/band/view')
+def view_by_band():
+    bands = Bands.query.all() 
+    memberships = Memberships.query.all()
+    return render_template('display_by_band.html', bands=bands, memberships=memberships)       
+
+@app.route('/bands/view/<int:id>')
+def view_band(id):
+    band=Bands.query.get_or_404(id)
+    memberships = Memberships.query.all()
+    return render_template('view_band.html', band=band, memberships=memberships)
+
+@app.route('/memberships/edit/<int:id>', methods=['GET','POST'])
+def edit_memberships(membership_id):
+    membership = Memberships.query.get_or_404(membership_id)
+    bands = Bands.query.all()
+    members = Members.query.all()
+    if request.method == 'POST':
+        membership.MembershipID = request.form.get('membership_id')
+        membership.BandID = request.form.get('bandid')
+        membership.MemberID = request.form.get('memberid')
+        membership.Role = request.form.get('role')
+        membership.StartYear = request.form.get('startyear') or None
+        membership.EndYear = request.form.get('endyear') or None
+        db.session.commit()
+        # flash('Membership updated', 'success')
+        return redirect(url_for('view_by_band'))
+    return render_template('edit_membership.html', membership=membership, bands=bands, members=members)
+
+
+@app.route('/memberships/delete/<int:id>')
+def delete_membership(id):
+    membership = Memberships.query.get_or_404(id)
+    db.session.delete(membership)
+    db.session.commit()
+    # flash('Membership removed', 'success')
+    return redirect(url_for('view_by_band'))
+
+@app.route('/bands/edit/<int:band_id>')
+def edit_band(band_id):
+    band = Bands.query.get_or_404(band_id)
+    if request.method == 'POST':
+        try:
+            band.Name = request.form.get('bandname')
+            band.FormedYear = request.form.get('formedyear')
+            band.HomeLocation = request.form.get('homelocation')
+            db.session.add(band)
+            db.session.commit()
+            return redirect(url_for('view_by_band'))
+        except Exception as e:
+            db.session.rollback()
+            error = f"Error updating band: {e}"
+            return render_template('edit_band.html', band=band, error=error)
+    return render_template('edit_band.html', band=band)
+
+@app.route('/bands/delete/<int:band_id>')
+def delete_band(band_id):
+    band = Bands.query.get_or_404(band_id)
+    try:
+        db.session.delete(band)
+        db.session.commit()
+        return redirect(url_for('view_by_band'))
+    except Exception as e:
+        db.session.rollback()
+        error = f"Error deleting band: {e}"
+        return redirect(url_for('view_by_band'))
+
+@app.route('/members/view')
+def view_by_member():
+    members = Members.query.all()
+    memberships = Memberships.query.all()
+    return render_template('display_by_member.html', members=members,
+    memberships=memberships)
+
+@app.route('/members/view/<int:id>')
+def view_member(id):
+    member = Members.query.get_or_404(id)
+    memberships = Memberships.query.all()
+    return render_template('view_member.html', member=member, memberships=memberships)

@@ -27,9 +27,9 @@ class Members(db.Model):
 class Memberships(db.Model):
     MembershipID = db.Column(db.Integer, primary_key=True)
     BandID = db.Column(db.Integer, db.ForeignKey(
-    'bands.bandID', nullable=False))
+    'bands.BandID'), nullable=False)
     MemberID = db.Column(db.Integer, db.ForeignKey(
-    'members.memberID', nullable=False))
+    'members.MemberID'), nullable=False)
     Role = db.Column(db.String(80))
     StartYear = db.Column(db.Integer)
     EndYear = db.Column(db.Integer) # NULL if still active
