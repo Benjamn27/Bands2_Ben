@@ -121,8 +121,8 @@ def view_band(id):
     return render_template('view_band.html', band=band, memberships=memberships)
 
 @app.route('/memberships/edit/<int:id>', methods=['GET','POST'])
-def edit_memberships(membership_id):
-    membership = Memberships.query.get_or_404(membership_id)
+def edit_memberships(id):
+    membership = Memberships.query.get_or_404(id)
     bands = Bands.query.all()
     members = Members.query.all()
     if request.method == 'POST':
@@ -223,8 +223,8 @@ def view_album(id):
     return render_template('view_album.html', album=album, ownership=ownership)
 
 @app.route('/ownership/edit/<int:id>', methods=['GET','POST'])
-def edit_ownership(ownership_id):
-    ownership = Ownership.query.get_or_404(ownership_id)
+def edit_ownership(id):
+    ownership = Ownership.query.get_or_404(id)
     bands = Bands.query.all()
     albums = Albums.query.all()
     if request.method == 'POST':
