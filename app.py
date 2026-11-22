@@ -213,7 +213,7 @@ error=error)
 def view_by_album():
     albums = Albums.query.all()
     ownerships = Ownership.query.all()
-    return render_template('display_by_member.html', albums=albums,
+    return render_template('display_by_album.html', albums=albums,
     ownerships=ownerships)
 
 @app.route('/albums/view/<int:id>')
