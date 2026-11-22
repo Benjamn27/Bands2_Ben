@@ -11,8 +11,8 @@
     >
   </h3>
 
-  <a href="{{ url_for('edit_band', id=band.BandID) }}">Edit</a> |
-  <a href="{{ url_for('delete_band', id=band.BandID) }}">Delete</a>
+  <a href="{{ url_for('edit_band', band_id=band.BandID) }}">Edit</a> |
+  <a href="{{ url_for('delete_band', band_id=band.BandID) }}">Delete</a>
 
   <p><strong>Home:</strong> {{ band.HomeLocation }}</p>
 
@@ -23,7 +23,7 @@
       {{ m.member.MemberName }} - {{ m.Role or m.member.MainPosition }} {% if
       m.StartYear %} ({{ m.StartYear }}{% if m.EndYear %} – {{ m.EndYear }}{%
       else %} - present{% endif %}){% endif %} &nbsp;
-      <a href="{{ url_for('edit_membership', id=m.MembershipID) }}">Edit</a> |
+      <a href="{{ url_for('edit_memberships', id=m.MembershipID) }}">Edit</a> |
       <a href="{{ url_for('delete_membership', id=m.MembershipID) }}">Delete</a>
     </li>
     {% else %}
@@ -33,8 +33,13 @@
 
   <h4>Albums</h4>
   <ul>
-    {% for album in band.albums %}
-    <li>{{ album.AlbumTitle }} ({{ album.ReleaseYear }})</li>
+    {% for o in band.ownerships %}
+    <li>
+      {{ o.album.AlbumTitle }} ({{ o.album.ReleaseYear }})
+      <a href="{{ url_for('edit_ownership', id=o.OwnershipID) }}">Edit</a> |
+      <a href="{{ url_for('delete_ownership', id=o.OwnershipID) }}">Delete</a>
+
+    </li>
     {% endfor %}
   </ul>
 </section>

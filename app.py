@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-from model import db, Bands, Members, Albums, Memberships, admin
+from model import db, Bands, Members, Albums, Memberships, Ownership, admin
 from flask_admin.contrib.sqla import ModelView
 import os
 
@@ -69,7 +69,6 @@ def add_album():
         new_album = Albums(
             AlbumTitle=request.form['albumtitle'],
             ReleaseYear=request.form['releaseyear'],
-            BandID=request.form['bandid']
         )
         db.session.add(new_album)
         db.session.commit()
@@ -188,3 +187,60 @@ def view_member(id):
     member = Members.query.get_or_404(id)
     memberships = Memberships.query.all()
     return render_template('view_member.html', member=member, memberships=memberships)
+
+@app.route('/ownership/add', methods=['GET','POST'])
+def add_ownership():
+    bands = Bands.query.all()
+    albums = Albums.query.all()
+    if request.method == 'POST':
+        try:
+            ownership = Ownership(
+            BandID=request.form.get('bandid'),
+            AlbumID=request.form.get('albumid'),
+            )
+            db.session.add(ownership)
+            db.session.commit()
+            # flash('Membership assigned', 'success')
+            return redirect(url_for('view_by_band'))
+        except Exception as e:
+            db.session.rollback()
+            error = f"Error adding new ownership: {e}"
+            return render_template('add_ownership.html', bands=bands, albums=albums,
+error=error)
+    return render_template('add_ownership.html', bands=bands, albums=albums)
+
+@app.route('/albums/view')
+def view_by_album():
+    albums = Albums.query.all()
+    ownerships = Ownership.query.all()
+    return render_template('display_by_member.html', albums=albums,
+    ownerships=ownerships)
+
+@app.route('/albums/view/<int:id>')
+def view_album(id):
+    album = Albums.query.get_or_404(id)
+    ownership = Ownership.query.all()
+    return render_template('view_album.html', album=album, ownership=ownership)
+
+@app.route('/ownership/edit/<int:id>', methods=['GET','POST'])
+def edit_ownership(ownership_id):
+    ownership = Ownership.query.get_or_404(ownership_id)
+    bands = Bands.query.all()
+    albums = Albums.query.all()
+    if request.method == 'POST':
+        ownership.OwnershipID = request.form.get('ownership_id')
+        ownership.BandID = request.form.get('bandid')
+        ownership.AlbumID = request.form.get('albumid')
+        db.session.commit()
+        # flash('Membership updated', 'success')
+        return redirect(url_for('view_by_band'))
+    return render_template('edit_ownership.html', ownership=ownership, bands=bands, albums=albums)
+
+
+@app.route('/ownership/delete/<int:id>')
+def delete_ownership(id):
+    ownership = Ownership.query.get_or_404(id)
+    db.session.delete(ownership)
+    db.session.commit()
+    # flash('Membership removed', 'success')
+    return redirect(url_for('view_by_band'))

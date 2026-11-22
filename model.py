@@ -14,7 +14,7 @@ class Bands(db.Model):
     # Removed members relationship in favor of memberships
     # members = db.relationship('Members', backref='band', lazy=True)
     memberships = db.relationship('Memberships', backref='band', lazy=True)
-    albums = db.relationship('Albums', backref='band', lazy=True)
+    ownerships = db.relationship('Ownership', backref='band', lazy=True)
 class Members(db.Model):
     MemberID = db.Column(db.Integer, primary_key=True)
     # Removed BandID
@@ -37,7 +37,13 @@ class Memberships(db.Model):
 
 class Albums(db.Model):
     AlbumID = db.Column(db.Integer, primary_key=True)
-    BandID = db.Column(db.Integer, db.ForeignKey(
-        'bands.BandID'), nullable=False)
     AlbumTitle = db.Column(db.String(80), nullable=False)
     ReleaseYear = db.Column(db.Integer)
+    ownership = db.relationship('Ownership', backref='album', lazy=True)
+
+class Ownership(db.Model):
+    OwnershipID = db.Column(db.Integer, primary_key=True)
+    BandID = db.Column(db.Integer, db.ForeignKey(
+    'bands.BandID'), nullable=False)
+    AlbumID = db.Column(db.Integer, db.ForeignKey(
+    'albums.AlbumID'), nullable=False)

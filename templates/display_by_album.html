@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block title %} {{super()}} - Albums {% endblock %}
+{% block content %}
+<h2>Albums</h2>
+{% for album in albums %}
+<section>
+<h3>
+<a href="{{url_for('view_album', id=album.AlbumID)}}">{{ album.AlbumName }}</a>
+</h3>
+<h4>Bands</h4>
+<ul>
+{% for a in album.ownerships %}
+<li>
+<a href="{{url_for('view_band', id=a.band.BandID)}}">{{m.band.BandName}}</a> - {{ m.releaseyear }}
+
+&nbsp;
+<a href="{{ url_for('edit_ownerships', id=a.AlbumID) }}">Edit</a> |
+<a href="{{ url_for('delete_ownership', id=a.AlbumID) }}">Delete</a>
+<br>
+</section>
+<hr />
+{% endfor %}
+{% endblock %} 
