@@ -13,7 +13,7 @@
             <ul>
                 {% for m in band.memberships %}
                 <li>
-                    {{ m.member.MemberName }} - {{ m.Role or m.member.MainPosition }}
+                    <a href="{{ url_for('view_member', id=m.MembershipID) }}">{{ m.member.MemberName }}</a> - {{ m.Role or m.member.MainPosition }}
                     {% if m.StartYear %} ({{ m.StartYear }}{% if m.EndYear %} – {{ m.EndYear }}{% else %} - present{%
                     endif%}){% endif %}
                     &nbsp;
@@ -28,7 +28,9 @@
             <h4>Albums</h4>
             <ul>
                 {% for o in band.ownerships %}
-                {{ o.album.AlbumTitle }} ({{ o.album.ReleaseYear }})
+                    <a href="{{ url_for('view_album', id=o.OwnershipID) }}">{{ o.album.AlbumTitle }}</a> ({{ o.album.ReleaseYear }})
+                    <a href="{{ url_for('edit_ownership', id=o.OwnershipID) }}">Edit</a> |
+                    <a href="{{ url_for('delete_ownership', id=o.OwnershipID) }}">Delete</a>
                 {% endfor %}
             </ul>
             </p>
